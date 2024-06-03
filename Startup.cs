@@ -1,7 +1,10 @@
 using ApiSegundoExamen.Data;
+using ApiSegundoExamen.Helpers;
 using ApiSegundoExamen.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MvcSegundoExamen.Models;
+using Newtonsoft.Json;
 
 namespace ApiSegundoExamen;
 
@@ -17,8 +20,12 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
-        string connectionString =
-            Configuration.GetConnectionString("MySql");
+        /*string connectionString =
+            Configuration.GetConnectionString("MySql");*/
+        string jsonSecrets = HelperSecretManager.GetSecretsAsync().GetAwaiter().GetResult();
+        KeysModel keysModel = JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
+        services.AddSingleton<KeysModel>(x => keysModel);
+        string connectionString = keysModel.MySql;
 
         services.AddTransient<RepositoryEventos>();
 
